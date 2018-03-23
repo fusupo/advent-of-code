@@ -69,4 +69,25 @@
 (corruption-checksum checksumA) ;; 18
 (corruption-checksum checksumB) ;; 47136
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; CORRUPTION CHECKSUM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; HIGH-ENTROPY PASSPHRASES
+
+(def phraselistA (slurp "resources/phraselistA.txt"))
+(def phraselistB (slurp "resources/phraselistB.txt"))
+
+(defn is-valid-passphrase [phrase]
+  (let [words (str/split phrase #" ")
+        words-set (set words)]
+    (= (count words) (count words-set))))
+
+(defn count-valid-passphrases [phrase-list]
+  (let [lines (str/split-lines phrase-list)]
+    (reduce
+     (fn [m l]
+       (if (is-valid-passphrase l)
+         (+ m 1)
+         m))
+     0
+     lines)))
+
+(count-valid-passphrases phraselistA)
+(count-valid-passphrases phraselistB)

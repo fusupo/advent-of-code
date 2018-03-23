@@ -1,5 +1,6 @@
 (ns advent-of-code.core
-  (require [clojure.test :refer [is]]))
+  (:require [clojure.test :refer [is]]
+            [clojure.string :as str]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; INVERSE-CAPTCHA
 
@@ -39,4 +40,33 @@
 
 (print (inverse-captcha test-input-X)) ;;1251
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; CORRUPTION CHECKSUM
+
+(def checksumA (slurp "resources/checksumA.txt"))
+(def checksumB (slurp "resources/checksumB.txt"))
+
+(defn reduce-dgts-with-pred [dgts pred]
+  (reduce
+   (fn [m i]
+     (if (pred m i) m i))
+   (first dgts)
+   dgts))
+
+(defn find-diff [line]
+  (let [dgts (map read-string (str/split line #"[ \t]"))
+        lesser (reduce-dgts-with-pred dgts <)
+        greater (reduce-dgts-with-pred dgts >)]
+    (- greater lesser)))
+
+(defn corruption-checksum [spreadsheet]
+  (let [lines (str/split-lines spreadsheet)]
+    (reduce
+     (fn [m l]
+       (+ m (find-diff l)))
+     0
+     lines)))
+
+(corruption-checksum checksumA) ;; 18
+(corruption-checksum checksumB) ;; 47136
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; CORRUPTION CHECKSUM
